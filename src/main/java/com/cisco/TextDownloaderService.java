@@ -25,14 +25,15 @@ public class TextDownloaderService {
     public String fetchText(URL url) throws TextFetchingException {
 
 
-        Document doc = null;
+        Document doc;
+        ResponseEntity<String> httpResult = null;
         try {
-            ResponseEntity<String> httpResult = restTemplate.getForEntity(url.toString(), String.class);
+            httpResult = restTemplate.getForEntity(url.toString(), String.class);
             doc = Jsoup.parse(httpResult.getBody());
             return doc.body().text();
-        } catch (RestClientException | IllegalArgumentException e) {
-            log.error("Error while retrieving url: {}",url.toString(), e);
-            throw new TextFetchingException();
+        } catch (RestClientException | IllegalStateException | IllegalArgumentException e) {
+            log.error("Error while retrieving url: {} \n {}",url.toString(),httpResult, e);
+            throw new TextFetchingException(url);
         }
     }
 }
