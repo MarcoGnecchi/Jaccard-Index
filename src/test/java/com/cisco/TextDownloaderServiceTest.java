@@ -48,7 +48,7 @@ public class TextDownloaderServiceTest {
     RestTemplate restTemplate;
 
     @Test
-    public void shouldFetchTheContendOfTheRequest() throws MalformedURLException, URISyntaxException {
+    public void shouldFetchTheContendOfTheRequest() throws MalformedURLException, URISyntaxException, TextFetchingException {
         MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
 
         server.expect(ExpectedCount.once(), requestTo("http://test")).andExpect(method(HttpMethod.GET))

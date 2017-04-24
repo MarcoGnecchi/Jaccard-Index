@@ -18,8 +18,8 @@ public class JaccardIndexController {
     private TextDownloaderService textDownloaderService;
 
     @RequestMapping(path = "/")
-    public void performJaccardIndex(@RequestParam(value = "url1") String url1,
-            @RequestParam(value = "url2") String url2) throws MalformedURLException, URISyntaxException {
+    public float performJaccardIndex(@RequestParam(value = "url1") String url1,
+                                     @RequestParam(value = "url2") String url2) throws MalformedURLException, TextFetchingException {
 
         // Validating provided urls
         URL valid_url1 = new URL(url1);
@@ -29,11 +29,17 @@ public class JaccardIndexController {
         String text2 = textDownloaderService.fetchText(valid_url2);
 
 
-        jaccardIndexService.perform(text1, text2);
+        return jaccardIndexService.perform(text1, text2);
     }
 
     @ExceptionHandler(MalformedURLException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "URL is not valid")
     public void handleMalformedUrl() {
     }
+
+    @ExceptionHandler(TextFetchingException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error while fetching URL")
+    public void handleURLFetching() {
+    }
+
 }

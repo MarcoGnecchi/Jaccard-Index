@@ -1,5 +1,6 @@
 package com.cisco;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -37,7 +39,7 @@ public class JaccardIndexControllerTest {
     private TextDownloaderService textDownloader;
 
     @Before
-    public void setUp() throws MalformedURLException {
+    public void setUp() throws MalformedURLException, TextFetchingException {
         when(textDownloader.fetchText(new URL(HTTP_WWW_BBC_CO_UK))).thenReturn(BBC_TEXT_CONTENT);
         when(textDownloader.fetchText(new URL(HTTP_WWW_GOOGLE_COM))).thenReturn(GOOGLE_TEXT_CONTENT);
     }
@@ -64,10 +66,11 @@ public class JaccardIndexControllerTest {
 
     @Test
     public void shouldReturnJaccardIndex() throws Exception {
-        when(jaccardIndexService.perform(any(), any())).thenReturn(1);
-        mockMvc.perform(get("/").param("url1", "http://www.google.com").param("url2", "http://www.bbc.co.uk"))
+        when(jaccardIndexService.perform(any(), any())).thenReturn(Float.valueOf(1));
+        MvcResult resultActions = mockMvc.perform(get("/").param("url1", "http://www.google.com").param("url2", "http://www.bbc.co.uk"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(mvcResult -> mvcResult.getResponse().getContentAsString().equals("1"));
-    }
+                .andReturn();
 
+        assertEquals("1.0", resultActions.getResponse().getContentAsString());
+    }
 }
